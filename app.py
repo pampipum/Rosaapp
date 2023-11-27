@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import io
 import base64
+import os
 
 app = Flask(__name__)
 
@@ -138,4 +139,5 @@ def analyze():
     return jsonify(response)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))  # Use the PORT environment variable
+    app.run(host='0.0.0.0', port=port)
