@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Trading Strategy Analysis</title>
+  </head>
+  <body>
+    <h1>Configure Your Trading Strategy</h1>
+    <form action="/analyze" method="post">
+      <label for="start_date">Start Date:</label>
+      <input
+        type="date"
+        id="start_date"
+        name="start_date"
+        value="2023-01-01"
+      /><br /><br />
+
+      <label for="end_date">End Date:</label>
+      <input
+        type="date"
+        id="end_date"
+        name="end_date"
+        value="2023-11-27"
+      /><br /><br />
+
+      <label for="symbol">Symbol:</label>
+      <input
+        type="text"
+        id="symbol"
+        name="symbol"
+        value="BTC-USD"
+      /><br /><br />
+
+      <label for="adx_length">ADX Length:</label>
+      <input
+        type="number"
+        id="adx_length"
+        name="adx_length"
+        value="14"
+      /><br /><br />
+
+      <label for="ema_short">EMA Short:</label>
+      <input
+        type="number"
+        id="ema_short"
+        name="ema_short"
+        value="9"
+      /><br /><br />
+
+      <label for="ema_long">EMA Long:</label>
+      <input
+        type="number"
+        id="ema_long"
+        name="ema_long"
+        value="55"
+      /><br /><br />
+
+      <label for="adx_threshold">ADX Threshold:</label>
+      <input
+        type="number"
+        id="adx_threshold"
+        name="adx_threshold"
+        value="21"
+      /><br /><br />
+
+      <input type="submit" value="Submit" />
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        document.querySelector("form").onsubmit = function (event) {
+          event.preventDefault(); // Prevent the form from submitting in the traditional way
+
+          let formData = new FormData(this);
+
+          fetch("/analyze", {
+            method: "POST",
+            body: formData,
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              // Display the plot
+              document.getElementById(
+                "result"
+              ).innerHTML = `<img src="data:image/png;base64, ${data.plot_url}">`;
+
+              // Display trade details and summary
+              let summary = `<h2>Summary</h2><p>${data.summary}</p>`;
+              let tradeDetails = "<h2>Trade Details</h2>";
+              data.trade_details.forEach((trade) => {
+                tradeDetails += `<p>Type: ${trade.Type}, Entry: ${trade.Entry}, Exit: ${trade.Exit}, Profit/Loss: ${trade["Profit/Loss"]}, Entry Date: ${trade["Entry Date"]}, Exit Date: ${trade["Exit Date"]}</p>`;
+              });
+
+              document.getElementById("result").innerHTML +=
+                summary + tradeDetails;
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("An error occurred while processing your request.");
+            });
+        };
+      });
+    </script>
+  </body>
+</html>
